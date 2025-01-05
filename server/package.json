@@ -6,6 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "concurrently \"tsc -w\" \"nodemon dist/js/app.js\"",
+    "debug": "concurrently \"tsc -w\" \"nodemon --inspect dist/js/app.js\"",
     "lint": "eslint src/**/*.ts"
   },
   "keywords": [],
@@ -26,6 +27,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.5",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "socket.io": "^4.8.1"
   }
 }
