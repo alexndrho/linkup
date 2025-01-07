@@ -61,6 +61,10 @@ const ChatContainer = ({
   };
 
   const handleSendMesssage = () => {
+    if (messageInput === "") {
+      return;
+    }
+
     sendMessage(messageInput);
     setMessageInput("");
   };
