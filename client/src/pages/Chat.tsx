@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { userAtom } from "../store";
 import { socket } from "../config/socket";
 import ChatBubbleInfo from "../components/ChatBubbleInfo";
@@ -12,6 +12,8 @@ type MessageType = { sender: "me" | "stranger"; content: string };
 
 const Chat = () => {
   const navigate = useNavigate();
+
+  const chatEndRef = useRef<HTMLDivElement>(null);
   const [user] = useAtom(userAtom);
   const [stranger, setStranger] = useState<IUser | null>(null);
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -73,6 +75,10 @@ const Chat = () => {
     setMessages([...messages, newMessage]);
 
     socket.emit("send-message", newMessage);
+
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView();
+    }
   };
 
   return (
@@ -124,6 +130,8 @@ const Chat = () => {
             </div>
           </div>
         )}
+
+        <div ref={chatEndRef}></div>
       </ChatContainer>
     </div>
   );

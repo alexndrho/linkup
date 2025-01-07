@@ -92,8 +92,8 @@ const ChatContainer = ({
       </div>
 
       {/* Chat */}
-      <div className="flex-1 border-[1px] rounded-box border-base-300 px-2 py-3 overflow-y-scroll">
-        {children}
+      <div className="flex-1 flex flex-col-reverse border-[1px] rounded-box border-base-300 px-2 py-3 overflow-y-scroll">
+        <div className="flex-grow">{children}</div>
       </div>
 
       {/* Chat bar */}
