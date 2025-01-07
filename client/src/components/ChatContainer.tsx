@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { socket } from "../config/socket";
+import IUser from "../types/IUser";
 
 enum ChatStatus {
   CONNECTING,
@@ -12,6 +13,7 @@ enum ChatStatus {
 interface ChatContainerProps {
   children?: React.ReactNode;
   chatStatus: ChatStatus;
+  members?: { [key: string]: IUser };
   sendMessage: (msg: string) => void;
   newChat?: () => void;
 }
@@ -19,11 +21,13 @@ interface ChatContainerProps {
 const ChatContainer = ({
   children,
   chatStatus,
+  members,
   sendMessage,
   newChat,
 }: ChatContainerProps) => {
   const navigate = useNavigate();
 
+  const membersModalRef = useRef<HTMLDialogElement>(null);
   const newButtonRef = useRef<HTMLButtonElement>(null);
   const [messageInput, setMessageInput] = useState("");
   const [isConfirmNewChat, setIsConfirmNewChat] = useState(false);
@@ -60,7 +64,7 @@ const ChatContainer = ({
     newChat();
   };
 
-  const handleSendMesssage = () => {
+  const handleSendMessage = () => {
     if (messageInput === "") {
       return;
     }
@@ -92,7 +96,63 @@ const ChatContainer = ({
           </span>
         </h1>
 
-        <div className="flex-1"></div>
+        <div className="flex-1 flex justify-end">
+          {members && (
+            <>
+              {Object.keys(members).length > 0 && (
+                <button
+                  className="btn"
+                  onClick={() => membersModalRef.current?.showModal()}
+                >
+                  {Object.keys(members).length} member
+                  {Object.keys(members).length > 1 ? "s" : ""}
+                </button>
+              )}
+
+              <dialog ref={membersModalRef} className="modal">
+                <div className="modal-box">
+                  <form method="dialog">
+                    <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                      ✕
+                    </button>
+                  </form>
+
+                  <h3 className="font-bold text-lg">
+                    Member{Object.keys(members).length > 1 ? "s" : ""}
+                  </h3>
+
+                  <p className="py-4 overflow-scroll">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>Name</th>
+                          <th>Sex</th>
+                          <th>Location</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {Object.keys(members).map((key, index) => (
+                          <tr key={key}>
+                            <td>{index + 1}</td>
+                            <td>{members[key].name}</td>
+                            <td>{members[key].sex}</td>
+                            <td>{members[key].location}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </p>
+                </div>
+
+                <form method="dialog" className="modal-backdrop">
+                  <button>close</button>
+                </form>
+              </dialog>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Chat */}
@@ -130,7 +190,7 @@ const ChatContainer = ({
           value={messageInput}
           onKeyUp={(e) => {
             if (e.key === "Enter") {
-              handleSendMesssage();
+              handleSendMessage();
             }
           }}
           onChange={(e) => {
@@ -142,7 +202,7 @@ const ChatContainer = ({
         <button
           className="btn btn-primary"
           disabled={chatStatus !== ChatStatus.CONNECTED || messageInput === ""}
-          onClick={handleSendMesssage}
+          onClick={handleSendMessage}
         >
           Send
         </button>

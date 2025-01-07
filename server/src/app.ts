@@ -14,14 +14,15 @@ const io = new Server(server, {
 });
 const PORT = process.env.PORT || 3000;
 
+const roomNamespace = io.of("/room");
+
 const waitingUser: string[] = [];
 const pairedUser: { [key: string]: string } = {};
 
+// Random chat
 io.on("connection", (socket) => {
   socket.on("find-pair", () => {
-    if (waitingUser.includes(socket.id)) {
-      return;
-    } else if (pairedUser[socket.id]) {
+    if (waitingUser.includes(socket.id) || pairedUser[socket.id]) {
       return;
     }
 
@@ -93,6 +94,52 @@ io.on("connection", (socket) => {
       delete pairedUser[socket.id];
       delete pairedUser[pairedSocketId];
     }
+  });
+});
+
+// Chat rooms
+const roomsUsers: {
+  [key: string]: {
+    [key: string]: IUser;
+  };
+} = {};
+
+roomNamespace.on("connection", (socket) => {
+  socket.on("join-room", (room: string, user: IUser, cb?: () => void) => {
+    socket.join(room);
+
+    if (!roomsUsers[room]) {
+      roomsUsers[room] = {};
+    }
+
+    roomsUsers[room][socket.id] = user;
+
+    socket.to(room).emit("user-connected", user);
+
+    socket.nsp.to(room).emit("receive-members", roomsUsers[room]);
+
+    if (cb) cb();
+  });
+
+  socket.on("send-message", (room: string, message) => {
+    if (!roomsUsers[room] || !roomsUsers[room][socket.id]) return;
+
+    const name = roomsUsers[room][socket.id].name;
+    socket.to(room).emit("receive-message", name, message);
+  });
+  socket.on("disconnect", () => {
+    const rooms = Object.keys(roomsUsers);
+
+    rooms.forEach((room) => {
+      const user = roomsUsers[room][socket.id];
+
+      if (!user) return;
+
+      delete roomsUsers[room][socket.id];
+
+      socket.to(room).emit("user-disconnected", user);
+      socket.to(room).emit("receive-members", roomsUsers[room]);
+    });
   });
 });
 

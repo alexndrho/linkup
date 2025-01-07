@@ -120,17 +120,19 @@ const Home = () => {
         </label>
 
         <button
-          className="w-full btn btn-primary"
+          className="w-full mb-3 btn btn-primary"
           disabled={user.name === ""}
-          onClick={() => {
-            if (user.name === "") {
-              return;
-            }
-
-            navigate("/chat");
-          }}
+          onClick={() => navigate("/chat")}
         >
-          Connect
+          Connect with a Stranger
+        </button>
+
+        <button
+          className="w-full btn"
+          disabled={user.name === ""}
+          onClick={() => navigate("/public")}
+        >
+          Join Public Chat
         </button>
       </div>
     </div>

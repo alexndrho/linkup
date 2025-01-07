@@ -5,8 +5,9 @@ import { userAtom } from "../store";
 import { socket } from "../config/socket";
 import ChatBubbleInfo from "../components/ChatBubbleInfo";
 import ChatBubble from "../components/ChatBubble";
-import IUser from "../types/IUser";
 import ChatContainer, { ChatStatus } from "../components/ChatContainer";
+import SystemChatBubble from "../components/SystemChatBubble";
+import IUser from "../types/IUser";
 
 type MessageType = { sender: "me" | "stranger"; content: string };
 
@@ -124,11 +125,14 @@ const Chat = () => {
         ))}
 
         {isStrangerLeft && (
-          <div className="my-2 flex flex-col justify-center items-center">
-            <div className="badge badge-error">
-              <span className="font-bold">"{stranger?.name}"</span> left.
-            </div>
-          </div>
+          <SystemChatBubble
+            status="error"
+            message={
+              <>
+                <span className="font-bold">"{user.name}"</span> left.
+              </>
+            }
+          />
         )}
 
         <div ref={chatEndRef}></div>

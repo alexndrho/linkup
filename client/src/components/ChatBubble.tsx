@@ -1,7 +1,7 @@
 interface ChatBubbleProps {
   sender: "me" | "stranger";
   name: string;
-  message: string;
+  message: string | React.ReactNode;
 }
 
 const ChatBubble = ({ sender, name, message }: ChatBubbleProps) => {

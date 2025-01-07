@@ -4,4 +4,8 @@ const socket = io(import.meta.env.VITE_SERVER_URL, {
   autoConnect: false,
 });
 
-export { socket };
+const roomSocket = io(import.meta.env.VITE_SERVER_URL + "/room", {
+  autoConnect: false,
+});
+
+export { socket, roomSocket };
