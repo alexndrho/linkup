@@ -10,4 +10,5 @@ export default {
   daisyui: {
     themes: ["bumblebee"],
   },
+  safelist: ["badge-success", "badge-info", "badge-warning", "badge-error"],
 };
