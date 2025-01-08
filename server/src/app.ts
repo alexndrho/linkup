@@ -124,8 +124,9 @@ roomNamespace.on("connection", (socket) => {
   socket.on("send-message", (room: string, message) => {
     if (!roomsUsers[room] || !roomsUsers[room][socket.id]) return;
 
-    const name = roomsUsers[room][socket.id].name;
-    socket.to(room).emit("receive-message", name, message);
+    const user = roomsUsers[room][socket.id];
+    console.log(user);
+    socket.to(room).emit("receive-message", user, message);
   });
   socket.on("disconnect", () => {
     const rooms = Object.keys(roomsUsers);

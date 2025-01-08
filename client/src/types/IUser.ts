@@ -1,7 +1,7 @@
 enum Sex {
   MALE = "M",
   FEMALE = "F",
-  UNSPECIFIED = "~",
+  UNSPECIFIED = "",
 }
 
 interface IUser {

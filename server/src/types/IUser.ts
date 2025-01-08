@@ -1,15 +1,15 @@
-enum Gender {
-  MALE,
-  FEMALE,
-  UNSPECIFIED,
+enum Sex {
+  MALE = "M",
+  FEMALE = "F",
+  UNSPECIFIED = "",
 }
 
 interface IUser {
   name: string;
-  gender: Gender;
+  sex: Sex;
   age: number | null;
-  location: string;
+  location: string | null;
 }
 
 export default IUser;
-export { Gender };
+export { Sex };

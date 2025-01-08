@@ -10,7 +10,7 @@ import IUser from "../types/IUser";
 
 type UserMessageType = {
   sender: "me" | "stranger";
-  name: string;
+  user: IUser;
   content: string | React.ReactNode;
 };
 
@@ -62,12 +62,12 @@ const Public = () => {
       setMembers(members);
     });
 
-    roomSocket.on("receive-message", (id: string, message: string) => {
+    roomSocket.on("receive-message", (user: IUser, message: string) => {
       setMessages((prev) => [
         ...prev,
         {
           sender: "stranger",
-          name: id,
+          user,
           content: message,
         },
       ]);
@@ -101,7 +101,7 @@ const Public = () => {
   const sendMessage = (msg: string) => {
     const message: MessageType = {
       sender: "me",
-      name: user.name,
+      user,
       content: msg,
     };
 
@@ -123,7 +123,7 @@ const Public = () => {
               <ChatBubble
                 key={index}
                 sender={message.sender}
-                name={message.name}
+                user={message.user}
                 message={message.content}
               />
             ) : (

@@ -119,7 +119,7 @@ const Chat = () => {
           <ChatBubble
             key={index}
             sender={content.sender}
-            name={content.sender === "me" ? user.name : stranger?.name ?? ""}
+            user={content.sender === "me" ? user : stranger!}
             message={content.content}
           />
         ))}

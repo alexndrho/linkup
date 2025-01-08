@@ -25,8 +25,8 @@ const ChatBubbleInfo = ({
         <span className="font-bold">"{name}"</span> has joined the chat
         <br />
         <span className="text-sm ">
-          <span className="font-bold">ASL:</span> {age ?? "~"}/{sex}/
-          {location === "" ? "~" : location}
+          <span className="font-bold">ASL:</span> {age ?? "~"}/
+          {sex === "" ? "~" : sex}/{location === "" ? "~" : location}
         </span>
       </div>
     </div>
