@@ -1,6 +1,7 @@
 import express from "express";
 import { Server } from "socket.io";
 import { createServer } from "http";
+import cors from "cors";
 import "dotenv/config";
 import IUser from "./types/IUser";
 
@@ -9,7 +10,6 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.CORS_ORIGIN,
-    methods: ["GET", "POST"],
   },
 });
 const PORT = process.env.PORT || 3000;
@@ -18,6 +18,12 @@ const roomNamespace = io.of("/room");
 const waitingUserChat: string[] = [];
 const waitingUserVideoChat: string[] = [];
 const pairedUser: { [key: string]: string } = {};
+
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+  }),
+);
 
 // Random chat
 io.on("connection", (socket) => {
