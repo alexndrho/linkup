@@ -283,7 +283,7 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
             status="error"
             message={
               <>
-                <span className="font-bold">"{user.name}"</span> left.
+                <span className="font-bold">"{stranger?.name}"</span> left.
               </>
             }
           />
