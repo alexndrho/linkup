@@ -12,6 +12,8 @@ const ChatBubble = ({ sender, user, message }: ChatBubbleProps) => {
 
   return (
     <div className={`chat ${sender === "me" ? "chat-end" : "chat-start"}`}>
+      <div className="chat-header">{user.name}</div>
+
       <button
         className={
           "chat-bubble" + (sender === "me" ? " chat-bubble-primary" : "")
@@ -20,7 +22,6 @@ const ChatBubble = ({ sender, user, message }: ChatBubbleProps) => {
           userModalRef.current?.showModal();
         }}
       >
-        <p className="text-sm font-bold text-start">{user.name}</p>
         {message}
       </button>
 
