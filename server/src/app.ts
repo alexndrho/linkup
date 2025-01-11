@@ -15,22 +15,22 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 3000;
 
 const roomNamespace = io.of("/room");
-
-const waitingUser: string[] = [];
+const waitingUserChat: string[] = [];
+const waitingUserVideoChat: string[] = [];
 const pairedUser: { [key: string]: string } = {};
 
 // Random chat
 io.on("connection", (socket) => {
   socket.on("find-pair", () => {
-    if (waitingUser.includes(socket.id) || pairedUser[socket.id]) {
+    if (waitingUserChat.includes(socket.id) || pairedUser[socket.id]) {
       return;
     }
 
-    if (waitingUser.length > 0) {
+    if (waitingUserChat.length > 0) {
       let isPaired = false;
 
-      for (let i = 0; i < waitingUser.length; i++) {
-        const pairedSocketId = waitingUser.splice(i, 1)[0];
+      for (let i = 0; i < waitingUserChat.length; i++) {
+        const pairedSocketId = waitingUserChat.splice(i, 1)[0];
 
         pairedUser[socket.id] = pairedSocketId;
         pairedUser[pairedSocketId] = socket.id;
@@ -42,10 +42,38 @@ io.on("connection", (socket) => {
       }
 
       if (!isPaired) {
-        waitingUser.push(socket.id);
+        waitingUserChat.push(socket.id);
       }
     } else {
-      waitingUser.push(socket.id);
+      waitingUserChat.push(socket.id);
+    }
+  });
+
+  socket.on("find-video-pair", () => {
+    if (waitingUserVideoChat.includes(socket.id) || pairedUser[socket.id]) {
+      return;
+    }
+
+    if (waitingUserVideoChat.length > 0) {
+      let isPaired = false;
+
+      for (let i = 0; i < waitingUserVideoChat.length; i++) {
+        const pairedSocketId = waitingUserVideoChat.splice(i, 1)[0];
+
+        pairedUser[socket.id] = pairedSocketId;
+        pairedUser[pairedSocketId] = socket.id;
+        io.to(socket.id).emit("pair-found");
+        io.to(pairedSocketId).emit("pair-found");
+
+        isPaired = true;
+        break;
+      }
+
+      if (!isPaired) {
+        waitingUserVideoChat.push(socket.id);
+      }
+    } else {
+      waitingUserVideoChat.push(socket.id);
     }
   });
 
@@ -54,6 +82,14 @@ io.on("connection", (socket) => {
 
     if (pairedSocketId) {
       io.to(pairedSocketId).emit("receive-info", info);
+    }
+  });
+
+  socket.on("send-peer-id", (peerId: string) => {
+    const pairedSocketId = pairedUser[socket.id];
+
+    if (pairedSocketId) {
+      io.to(pairedSocketId).emit("receive-peer-id", peerId);
     }
   });
 
@@ -80,10 +116,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    const waitingIndex = waitingUser.indexOf(socket.id);
+    const waitingIndex = waitingUserChat.indexOf(socket.id);
 
     if (waitingIndex !== -1) {
-      waitingUser.splice(waitingIndex, 1);
+      waitingUserChat.splice(waitingIndex, 1);
     }
 
     const pairedSocketId = pairedUser[socket.id];
@@ -125,7 +161,6 @@ roomNamespace.on("connection", (socket) => {
     if (!roomsUsers[room] || !roomsUsers[room][socket.id]) return;
 
     const user = roomsUsers[room][socket.id];
-    console.log(user);
     socket.to(room).emit("receive-message", user, message);
   });
   socket.on("disconnect", () => {

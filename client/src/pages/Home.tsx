@@ -119,13 +119,23 @@ const Home = () => {
           />
         </label>
 
-        <button
-          className="w-full mb-3 btn btn-primary"
-          disabled={user.name === ""}
-          onClick={() => navigate("/chat")}
-        >
-          Connect with a Stranger
-        </button>
+        <div className="flex justify-between gap-3">
+          <button
+            className="flex-1 mb-3 btn btn-primary"
+            disabled={user.name === ""}
+            onClick={() => navigate("/chat")}
+          >
+            Chat with a Stranger
+          </button>
+
+          <button
+            className="flex-1 mb-3 btn btn-secondary"
+            disabled={user.name === ""}
+            onClick={() => navigate("/video")}
+          >
+            Video Chat with a Stranger
+          </button>
+        </div>
 
         <button
           className="w-full btn"

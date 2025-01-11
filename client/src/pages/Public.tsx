@@ -117,26 +117,28 @@ const Public = () => {
         members={members}
         sendMessage={sendMessage}
       >
-        {messages.map((message, index) => (
-          <>
-            {message.sender === "me" || message.sender === "stranger" ? (
-              <ChatBubble
-                key={index}
-                sender={message.sender}
-                user={message.user}
-                message={message.content}
-              />
-            ) : (
-              message.sender === "system" && (
-                <SystemChatBubble
+        <ChatContainer.Chat>
+          {messages.map((message, index) => (
+            <>
+              {message.sender === "me" || message.sender === "stranger" ? (
+                <ChatBubble
                   key={index}
-                  status={message.status}
+                  sender={message.sender}
+                  user={message.user}
                   message={message.content}
                 />
-              )
-            )}
-          </>
-        ))}
+              ) : (
+                message.sender === "system" && (
+                  <SystemChatBubble
+                    key={index}
+                    status={message.status}
+                    message={message.content}
+                  />
+                )
+              )}
+            </>
+          ))}
+        </ChatContainer.Chat>
       </ChatContainer>
     </div>
   );
