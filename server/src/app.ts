@@ -32,25 +32,21 @@ io.on("connection", (socket) => {
       return;
     }
 
-    if (waitingUserChat.length > 0) {
-      let isPaired = false;
+    let isPaired = false;
 
-      for (let i = 0; i < waitingUserChat.length; i++) {
-        const pairedSocketId = waitingUserChat.splice(i, 1)[0];
+    for (let i = 0; i < waitingUserChat.length; i++) {
+      const pairedSocketId = waitingUserChat.splice(i, 1)[0];
 
-        pairedUser[socket.id] = pairedSocketId;
-        pairedUser[pairedSocketId] = socket.id;
-        io.to(socket.id).emit("pair-found");
-        io.to(pairedSocketId).emit("pair-found");
+      pairedUser[socket.id] = pairedSocketId;
+      pairedUser[pairedSocketId] = socket.id;
+      io.to(socket.id).emit("pair-found");
+      io.to(pairedSocketId).emit("pair-found");
 
-        isPaired = true;
-        break;
-      }
+      isPaired = true;
+      break;
+    }
 
-      if (!isPaired) {
-        waitingUserChat.push(socket.id);
-      }
-    } else {
+    if (!isPaired) {
       waitingUserChat.push(socket.id);
     }
   });
@@ -60,25 +56,21 @@ io.on("connection", (socket) => {
       return;
     }
 
-    if (waitingUserVideoChat.length > 0) {
-      let isPaired = false;
+    let isPaired = false;
 
-      for (let i = 0; i < waitingUserVideoChat.length; i++) {
-        const pairedSocketId = waitingUserVideoChat.splice(i, 1)[0];
+    for (let i = 0; i < waitingUserVideoChat.length; i++) {
+      const pairedSocketId = waitingUserVideoChat.splice(i, 1)[0];
 
-        pairedUser[socket.id] = pairedSocketId;
-        pairedUser[pairedSocketId] = socket.id;
-        io.to(socket.id).emit("pair-found");
-        io.to(pairedSocketId).emit("pair-found");
+      pairedUser[socket.id] = pairedSocketId;
+      pairedUser[pairedSocketId] = socket.id;
+      io.to(socket.id).emit("pair-found");
+      io.to(pairedSocketId).emit("pair-found");
 
-        isPaired = true;
-        break;
-      }
+      isPaired = true;
+      break;
+    }
 
-      if (!isPaired) {
-        waitingUserVideoChat.push(socket.id);
-      }
-    } else {
+    if (!isPaired) {
       waitingUserVideoChat.push(socket.id);
     }
   });
