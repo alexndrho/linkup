@@ -208,7 +208,7 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
           <div className="flex-1 h-full rounded-lg overflow-hidden">
             <video
               ref={userVideoRef}
-              className={`w-full h-full object-cover ${
+              className={`w-full h-full object-cover scale-x-[-1] ${
                 userMediaStream ? "block" : "hidden"
               }`}
               autoPlay
@@ -226,7 +226,7 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
           <div className="flex-1 h-full rounded-lg overflow-hidden">
             <video
               ref={strangerVideoRef}
-              className={`w-full h-full object-cover ${
+              className={`w-full h-full object-cover scale-x-[-1] ${
                 isStrangerHasStream ? "block" : "hidden"
               }`}
               autoPlay
