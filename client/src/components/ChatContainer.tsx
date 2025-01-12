@@ -156,9 +156,7 @@ const ChatContainer = ({
       </div>
 
       {/* Chat */}
-      <div className="flex-1 flex flex-col gap-3 overflow-y-auto">
-        {children}
-      </div>
+      <div className="flex-1 flex flex-col gap-3 overflow-auto">{children}</div>
 
       {/* Chat bar */}
       <div className="w-full flex gap-2">
@@ -211,18 +209,14 @@ const ChatContainer = ({
   );
 };
 
-ChatContainer.Chat = ({ children }: { children: React.ReactNode }) => {
+ChatContainer.Chat = function Chat({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex-1 flex flex-col-reverse border-[1px] rounded-box border-base-300 px-2 py-3 overflow-y-scroll">
+    <div className="flex-1 flex flex-col-reverse px-2 py-3 border-[1px] border-base-300 rounded-box overflow-y-scroll">
       <div className="flex-grow">{children}</div>
-    </div>
-  );
-};
-
-ChatContainer.Video = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="h-[560px] md:h-72 flex flex-col md:flex-row gap-3">
-      {children}
     </div>
   );
 };

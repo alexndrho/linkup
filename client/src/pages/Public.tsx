@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { userAtom } from "../store";
@@ -24,6 +24,8 @@ type MessageType = UserMessageType | SystemMessageType;
 
 const Public = () => {
   const navigate = useNavigate();
+
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const [user] = useAtom(userAtom);
   const [members, setMembers] = useState<{ [key: string]: IUser }>({});
@@ -98,6 +100,14 @@ const Public = () => {
     };
   }, [navigate, user]);
 
+  useEffect(() => {
+    if (messages.length <= 0) return;
+
+    if (chatEndRef.current && messages[messages.length - 1].sender === "me") {
+      chatEndRef.current?.scrollIntoView();
+    }
+  }, [messages]);
+
   const sendMessage = (msg: string) => {
     const message: MessageType = {
       sender: "me",
@@ -111,36 +121,36 @@ const Public = () => {
   };
 
   return (
-    <div className="max-w-[800px] h-screen mx-auto px-3 py-6 flex flex-col gap-2">
-      <ChatContainer
-        chatStatus={chatStatus}
-        members={members}
-        sendMessage={sendMessage}
-      >
-        <ChatContainer.Chat>
-          {messages.map((message, index) => (
-            <>
-              {message.sender === "me" || message.sender === "stranger" ? (
-                <ChatBubble
+    <ChatContainer
+      chatStatus={chatStatus}
+      members={members}
+      sendMessage={sendMessage}
+    >
+      <ChatContainer.Chat>
+        {messages.map((message, index) => (
+          <>
+            {message.sender === "me" || message.sender === "stranger" ? (
+              <ChatBubble
+                key={index}
+                sender={message.sender}
+                user={message.user}
+                message={message.content}
+              />
+            ) : (
+              message.sender === "system" && (
+                <SystemChatBubble
                   key={index}
-                  sender={message.sender}
-                  user={message.user}
+                  status={message.status}
                   message={message.content}
                 />
-              ) : (
-                message.sender === "system" && (
-                  <SystemChatBubble
-                    key={index}
-                    status={message.status}
-                    message={message.content}
-                  />
-                )
-              )}
-            </>
-          ))}
-        </ChatContainer.Chat>
-      </ChatContainer>
-    </div>
+              )
+            )}
+          </>
+        ))}
+
+        <div ref={chatEndRef}></div>
+      </ChatContainer.Chat>
+    </ChatContainer>
   );
 };
 

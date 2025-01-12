@@ -156,6 +156,16 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
     };
   }, [userMediaStream]);
 
+  useEffect(() => {
+    if (messages.length <= 0) return;
+
+    if (chatEndRef.current && messages[messages.length - 1].sender === "me") {
+      chatEndRef.current.scrollIntoView();
+    }
+  }, [messages]);
+
+  useEffect(() => {});
+
   // clean up
   useEffect(() => {
     return () => {
@@ -191,10 +201,6 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
     setMessages([...messages, newMessage]);
 
     socket.emit("send-message", newMessage);
-
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView();
-    }
   };
 
   return (
@@ -203,8 +209,9 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
       newChat={newChat}
       sendMessage={sendMessage}
     >
+      {/* With Video */}
       {withVideo && (
-        <ChatContainer.Video>
+        <div className="relative flex-1 md:flex-none w-full md:h-72 flex flex-col-reverse md:flex-row gap-3">
           <div className="flex-1 h-full rounded-lg overflow-hidden">
             <video
               ref={userVideoRef}
@@ -214,13 +221,11 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
               autoPlay
               playsInline
               muted
-            ></video>
+            />
 
-            {!userMediaStream && (
-              <div className="w-full h-full p-3 flex justify-center items-center bg-neutral text-base-100 text-lg font-bold text-center">
-                <div className="loading loading-spinner loading-lg" />
-              </div>
-            )}
+            <div className="w-full h-full p-3 flex justify-center items-center bg-neutral text-base-100 text-lg font-bold text-center">
+              <div className="loading loading-spinner loading-lg" />
+            </div>
           </div>
 
           <div className="flex-1 h-full rounded-lg overflow-hidden">
@@ -231,66 +236,95 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
               }`}
               autoPlay
               playsInline
-            ></video>
+            />
 
-            {!isStrangerHasStream && (
-              <div className="w-full h-full p-3 flex justify-center items-center bg-neutral text-base-100 text-lg font-bold text-center">
-                {chatStatus === ChatStatus.CONNECTED ? (
-                  <div className="loading loading-spinner loading-lg" />
-                ) : chatStatus === ChatStatus.CONNECTING ? (
-                  "Connecting to stranger..."
-                ) : (
-                  `${stranger?.name} left.`
-                )}
+            <div className="w-full h-full p-3 flex justify-center items-center bg-neutral text-base-100 text-lg font-bold text-center">
+              {chatStatus === ChatStatus.CONNECTED ? (
+                <div className="loading loading-spinner loading-lg" />
+              ) : chatStatus === ChatStatus.CONNECTING ? (
+                "Connecting to stranger..."
+              ) : (
+                `${stranger?.name} left.`
+              )}
+            </div>
+          </div>
+
+          <div className="md:hidden absolute bottom-0 w-full h-80 p-3 flex flex-col justify-end text-base-100 overflow-hidden">
+            {stranger && (
+              <div className="animate-fade-out">
+                <span className="font-bold">{stranger.name}</span>:{" "}
+                {stranger.age ?? "~"}/{stranger.sex === "" ? "~" : stranger.sex}
+                /{stranger.location === "" ? "~" : stranger.location}
+              </div>
+            )}
+
+            {messages.map((content, index) => (
+              <div key={index} className="animate-fade-out">
+                <span className="font-bold">
+                  {content.sender === "me" ? user.name : stranger?.name}
+                </span>
+                : {content.content}
+              </div>
+            ))}
+
+            {chatStatus === ChatStatus.DISCONNECTED && (
+              <div className="animate-fade-out">
+                <span className="font-bold">{stranger?.name}</span> left.
               </div>
             )}
           </div>
-        </ChatContainer.Video>
+        </div>
       )}
 
-      <ChatContainer.Chat>
-        {stranger && (
-          <>
-            <ChatBubbleInfo
-              sender="me"
-              name={user.name}
-              age={user.age}
-              sex={user.sex}
-              location={user.location}
+      <div
+        className={`flex-1 flex flex-col-reverse px-2 py-3 border-[1px] border-base-300 rounded-box overflow-y-scroll ${
+          withVideo ? "hidden md:flex" : ""
+        }`}
+      >
+        <div className="flex-grow">
+          {stranger && (
+            <>
+              <ChatBubbleInfo
+                sender="me"
+                name={user.name}
+                age={user.age}
+                sex={user.sex}
+                location={user.location}
+              />
+
+              <ChatBubbleInfo
+                sender="stranger"
+                name={stranger.name}
+                age={stranger.age}
+                sex={stranger.sex}
+                location={stranger.location}
+              />
+            </>
+          )}
+
+          {messages.map((content, index) => (
+            <ChatBubble
+              key={index}
+              sender={content.sender}
+              user={content.sender === "me" ? user : stranger!}
+              message={content.content}
             />
+          ))}
 
-            <ChatBubbleInfo
-              sender="stranger"
-              name={stranger.name}
-              age={stranger.age}
-              sex={stranger.sex}
-              location={stranger.location}
+          {chatStatus === ChatStatus.DISCONNECTED && (
+            <SystemChatBubble
+              status="error"
+              message={
+                <>
+                  <span className="font-bold">"{stranger?.name}"</span> left.
+                </>
+              }
             />
-          </>
-        )}
+          )}
 
-        {messages.map((content, index) => (
-          <ChatBubble
-            key={index}
-            sender={content.sender}
-            user={content.sender === "me" ? user : stranger!}
-            message={content.content}
-          />
-        ))}
-
-        {chatStatus === ChatStatus.DISCONNECTED && (
-          <SystemChatBubble
-            status="error"
-            message={
-              <>
-                <span className="font-bold">"{stranger?.name}"</span> left.
-              </>
-            }
-          />
-        )}
-
-        <div ref={chatEndRef}></div>
-      </ChatContainer.Chat>
+          <div ref={chatEndRef}></div>
+        </div>
+      </div>
     </ChatContainer>
   );
 };
