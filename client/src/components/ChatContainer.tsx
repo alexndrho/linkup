@@ -74,7 +74,7 @@ const ChatContainer = ({
   };
 
   return (
-    <div className="max-w-[800px] h-screen mx-auto px-3 py-6 flex flex-col gap-2">
+    <div className="max-w-[800px] h-dvh mx-auto px-3 py-6 flex flex-col gap-2">
       <div className="mb-3 flex items-center">
         <div className="flex-1 flex items-center">
           <button

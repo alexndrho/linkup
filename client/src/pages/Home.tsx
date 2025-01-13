@@ -8,8 +8,8 @@ const Home = () => {
   const [user, setUser] = useAtom(userAtom);
 
   return (
-    <div className="max-w-[800px] mx-auto px-3">
-      <div className="h-screen w-full flex flex-col py-14 justify-center">
+    <div className="max-w-[800px] h-dvh min-h-dvh mx-auto px-3">
+      <div className="h-full w-full flex flex-col py-14 justify-center">
         <h1 className="mb-8 text-6xl text-center font-bold">
           Link
           <span className="ml-1 p-1 bg-primary text-base-100 rounded-lg">
