@@ -1,11 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
 import { userAtom } from "../store";
-import { Sex } from "../types/IUser";
+import IUser, { Sex } from "../types/IUser";
 
 const Home = () => {
   const navigate = useNavigate();
   const [user, setUser] = useAtom(userAtom);
+
+  const handleSetUser = (user: IUser) => {
+    setUser(user);
+    localStorage.setItem("user", JSON.stringify(user));
+  };
 
   return (
     <div className="max-w-[800px] h-dvh min-h-dvh mx-auto px-3">
@@ -30,9 +35,7 @@ const Home = () => {
             type="text"
             className="input input-bordered w-full"
             value={user.name}
-            onChange={(e) =>
-              setUser((prev) => ({ ...prev, name: e.target.value }))
-            }
+            onChange={(e) => handleSetUser({ ...user, name: e.target.value })}
           />
         </label>
 
@@ -48,15 +51,15 @@ const Home = () => {
               }`}
               onClick={() => {
                 if (user.sex !== Sex.MALE) {
-                  setUser((prev) => ({
-                    ...prev,
+                  handleSetUser({
+                    ...user,
                     sex: Sex.MALE,
-                  }));
+                  });
                 } else {
-                  setUser((prev) => ({
-                    ...prev,
+                  handleSetUser({
+                    ...user,
                     sex: Sex.UNSPECIFIED,
-                  }));
+                  });
                 }
               }}
             >
@@ -68,15 +71,15 @@ const Home = () => {
               }`}
               onClick={() => {
                 if (user.sex !== Sex.FEMALE) {
-                  setUser((prev) => ({
-                    ...prev,
+                  handleSetUser({
+                    ...user,
                     sex: Sex.FEMALE,
-                  }));
+                  });
                 } else {
-                  setUser((prev) => ({
-                    ...prev,
+                  handleSetUser({
+                    ...user,
                     sex: Sex.UNSPECIFIED,
-                  }));
+                  });
                 }
               }}
             >
@@ -92,10 +95,10 @@ const Home = () => {
               min={0}
               value={user.age || ""}
               onChange={(e) =>
-                setUser((prev) => ({
-                  ...prev,
+                handleSetUser({
+                  ...user,
                   age: e.target.value === "" ? null : parseInt(e.target.value),
-                }))
+                })
               }
             />
           </label>
@@ -111,10 +114,10 @@ const Home = () => {
             className="input input-bordered w-full"
             value={user.location}
             onChange={(e) =>
-              setUser((prev) => ({
-                ...prev,
+              handleSetUser({
+                ...user,
                 location: e.target.value,
-              }))
+              })
             }
           />
         </label>
