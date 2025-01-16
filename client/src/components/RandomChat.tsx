@@ -211,7 +211,7 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
     >
       {/* With Video */}
       {withVideo && (
-        <div className="relative flex-1 md:flex-none w-full md:h-72 flex flex-col-reverse md:flex-row gap-3">
+        <div className="relative flex-1 md:flex-none w-full md:h-72 flex flex-col-reverse md:flex-row gap-2">
           <div className="flex-1 h-full rounded-lg overflow-hidden">
             <video
               ref={userVideoRef}

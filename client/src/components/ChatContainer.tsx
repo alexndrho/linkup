@@ -156,7 +156,7 @@ const ChatContainer = ({
       </div>
 
       {/* Chat */}
-      <div className="flex-1 flex flex-col gap-3 overflow-auto">{children}</div>
+      {children}
 
       {/* Chat bar */}
       <div className="w-full flex gap-2">
