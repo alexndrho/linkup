@@ -1,21 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useLocalStorage } from "@mantine/hooks";
+import { useEffect } from "react";
+import { useAtom } from "jotai";
 
-import { Sex, type IUser } from "@/types/user";
+import { loadUser, storeUser, userAtom } from "@/lib/store";
+import { Sex } from "@/types/user";
 
 export default function Home() {
   const router = useRouter();
-  const [user, setUser] = useLocalStorage<IUser>({
-    key: "user-profile",
-    defaultValue: {
-      name: "",
-      sex: Sex.UNSPECIFIED,
-      age: null,
-      location: "",
-    },
-  });
+  const [user, setUser] = useAtom(userAtom);
+
+  useEffect(() => {
+    setUser(loadUser());
+  }, [setUser]);
+
+  const setUserAndStore = (newUser: typeof user) => {
+    setUser(newUser);
+    storeUser(newUser);
+  };
 
   return (
     <div className="max-w-200 h-dvh mx-auto px-3">
@@ -40,7 +43,7 @@ export default function Home() {
             type="text"
             className="input input-bordered w-full"
             value={user.name || ""}
-            onChange={(e) => setUser({ ...user, name: e.target.value })}
+            onChange={(e) => setUserAndStore({ ...user, name: e.target.value })}
           />
         </label>
 
@@ -56,12 +59,12 @@ export default function Home() {
               }`}
               onClick={() => {
                 if (user.sex !== Sex.MALE) {
-                  setUser({
+                  setUserAndStore({
                     ...user,
                     sex: Sex.MALE,
                   });
                 } else {
-                  setUser({
+                  setUserAndStore({
                     ...user,
                     sex: Sex.UNSPECIFIED,
                   });
@@ -76,12 +79,12 @@ export default function Home() {
               }`}
               onClick={() => {
                 if (user.sex !== Sex.FEMALE) {
-                  setUser({
+                  setUserAndStore({
                     ...user,
                     sex: Sex.FEMALE,
                   });
                 } else {
-                  setUser({
+                  setUserAndStore({
                     ...user,
                     sex: Sex.UNSPECIFIED,
                   });
@@ -100,7 +103,7 @@ export default function Home() {
               min={0}
               value={user.age || ""}
               onChange={(e) =>
-                setUser({
+                setUserAndStore({
                   ...user,
                   age: e.target.value === "" ? null : parseInt(e.target.value),
                 })
@@ -119,7 +122,7 @@ export default function Home() {
             className="input input-bordered w-full"
             value={user.location || ""}
             onChange={(e) =>
-              setUser({
+              setUserAndStore({
                 ...user,
                 location: e.target.value,
               })
