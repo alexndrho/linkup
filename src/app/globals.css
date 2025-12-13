@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, bumblebee;
+}
+@source inline("badge-success");
+@source inline("badge-info");
+@source inline("badge-warning");
+@source inline("badge-error");
