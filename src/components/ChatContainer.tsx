@@ -90,7 +90,7 @@ export default function ChatContainer({
     if (onStopTyping) onStopTyping();
   };
 
-  useHotkeys([["Escape", () => handleNewChat()]]);
+  useHotkeys([["Escape", () => handleNewChat()]], []);
 
   return (
     <div className="max-w-200 h-dvh mx-auto px-3 py-6 flex flex-col gap-2">
