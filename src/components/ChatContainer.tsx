@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useHotkeys, useThrottledCallback } from "@mantine/hooks";
 import { FaArrowLeft } from "react-icons/fa";
 
 import { IUser } from "@/types/user";
 import { ChatStatus } from "@/types/chat";
 import { socket } from "@/config/socket";
-import { useHotkeys } from "@mantine/hooks";
 
 export interface ChatContainerProps {
   children?: React.ReactNode;
@@ -15,6 +15,8 @@ export interface ChatContainerProps {
   members?: { [key: string]: IUser };
   sendMessage: (msg: string) => void;
   newChat?: () => void;
+  onTyping?: () => void;
+  onStopTyping?: () => void;
 }
 
 export default function ChatContainer({
@@ -23,11 +25,14 @@ export default function ChatContainer({
   members,
   sendMessage,
   newChat,
+  onTyping,
+  onStopTyping,
 }: ChatContainerProps) {
   const membersModalRef = useRef<HTMLDialogElement>(null);
   const newButtonRef = useRef<HTMLButtonElement>(null);
   const [messageInput, setMessageInput] = useState("");
   const [isConfirmNewChat, setIsConfirmNewChat] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -61,6 +66,17 @@ export default function ChatContainer({
     newChat();
   };
 
+  const handleTyping = useThrottledCallback(() => {
+    if (onTyping) onTyping();
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = setTimeout(() => {
+      if (onStopTyping) onStopTyping();
+    }, 2000); // 2 seconds after last input
+  }, 1000);
+
   const handleSendMessage = () => {
     if (messageInput === "") {
       return;
@@ -68,6 +84,10 @@ export default function ChatContainer({
 
     sendMessage(messageInput);
     setMessageInput("");
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    if (onStopTyping) onStopTyping();
   };
 
   useHotkeys([["Escape", () => handleNewChat()]]);
@@ -188,11 +208,19 @@ export default function ChatContainer({
           onKeyUp={(e) => {
             if (e.key === "Enter") {
               handleSendMessage();
+              if (onStopTyping) onStopTyping();
             }
           }}
           onChange={(e) => {
             setIsConfirmNewChat(false);
             setMessageInput(e.target.value);
+            handleTyping();
+          }}
+          onBlur={() => {
+            if (onStopTyping) onStopTyping();
+            if (typingTimeoutRef.current) {
+              clearTimeout(typingTimeoutRef.current);
+            }
           }}
         />
 

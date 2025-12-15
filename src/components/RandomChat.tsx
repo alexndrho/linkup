@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import Peer from "peerjs";
+import { useDebouncedCallback } from "@mantine/hooks";
 
 import { socket } from "@/config/socket";
 import { userAtom } from "@/lib/store";
@@ -39,6 +40,12 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
   const [stranger, setStranger] = useState<IUser | null>(null);
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [chatStatus, setChatStatus] = useState(ChatStatus.CONNECTING);
+  const [isStrangerTyping, setIsStrangerTyping] = useState(false);
+
+  // set stranger typing timeout if no new typing signal received
+  const debounceStrangerTypingStop = useDebouncedCallback(() => {
+    setIsStrangerTyping(false);
+  }, 3000);
 
   useEffect(() => {
     if (user.name.trim() === "") {
@@ -82,6 +89,7 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
       message.sender = "stranger";
 
       setMessages((prev) => [...prev, message]);
+      setIsStrangerTyping(false); // stop typing on message received
     });
 
     socket.on("pair-disconnected", () => {
@@ -98,8 +106,26 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
       socket.off("receive-info");
       socket.off("receive-message");
       socket.off("pair-disconnected");
+      socket.off("typing");
+      socket.off("stop-typing");
     };
   }, [router, user, withVideo]);
+
+  // typing effect
+  useEffect(() => {
+    socket.on("typing", () => {
+      setIsStrangerTyping(true);
+      debounceStrangerTypingStop();
+    });
+    socket.on("stop-typing", () => {
+      setIsStrangerTyping(false);
+    });
+
+    return () => {
+      socket.off("typing");
+      socket.off("stop-typing");
+    };
+  }, [debounceStrangerTypingStop]);
 
   useEffect(() => {
     if (withVideo) {
@@ -204,6 +230,16 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
     setMessages([...messages, newMessage]);
 
     socket.emit("send-message", newMessage);
+    socket.emit("stop-typing"); // stop typing when message sent
+  };
+
+  // Typing signal: call this when user is typing
+  const handleTyping = () => {
+    socket.emit("typing");
+  };
+  // Typing signal: call this when user stops typing
+  const handleStopTyping = () => {
+    socket.emit("stop-typing");
   };
 
   return (
@@ -211,6 +247,8 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
       chatStatus={chatStatus}
       newChat={newChat}
       sendMessage={sendMessage}
+      onTyping={handleTyping}
+      onStopTyping={handleStopTyping}
     >
       {/* With Video */}
       {withVideo && (
@@ -313,6 +351,16 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
               message={content.content}
             />
           ))}
+
+          {isStrangerTyping && (
+            <ChatBubble
+              sender="stranger"
+              user={stranger!}
+              message={
+                <span className="loading loading-dots loading-md"></span>
+              }
+            />
+          )}
 
           {chatStatus === ChatStatus.DISCONNECTED && (
             <SystemChatBubble

@@ -97,6 +97,21 @@ app.prepare().then(() => {
       }
     );
 
+    // Typing signal events
+    socket.on("typing", () => {
+      const pairedSocketId = pairedUser[socket.id];
+      if (pairedSocketId) {
+        io.to(pairedSocketId).emit("typing");
+      }
+    });
+
+    socket.on("stop-typing", () => {
+      const pairedSocketId = pairedUser[socket.id];
+      if (pairedSocketId) {
+        io.to(pairedSocketId).emit("stop-typing");
+      }
+    });
+
     socket.on("disconnect-pair", () => {
       const pairedSocketId = pairedUser[socket.id];
 
