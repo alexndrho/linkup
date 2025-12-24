@@ -4,12 +4,13 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAtom } from "jotai";
 
-import { loadUser, storeUser, userAtom } from "@/lib/store";
+import { loadUser, onlineCountAtom, storeUser, userAtom } from "@/lib/store";
 import { Sex } from "@/types/user";
 
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useAtom(userAtom);
+  const [onlineCount] = useAtom(onlineCountAtom);
 
   useEffect(() => {
     setUser(loadUser());
@@ -30,9 +31,16 @@ export default function Home() {
           </span>
         </h1>
 
-        <p className="mb-5 text-lg text-center font-bold">
+        <p className="text-lg text-center font-bold">
           Anonymous random chat with strangers
         </p>
+        <div className="w-full mb-5 flex justify-center items-center gap-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
+          <p className="text-base font-normal ">
+            {onlineCount.toLocaleString()} {onlineCount <= 1 ? "user" : "users"}{" "}
+            online
+          </p>
+        </div>
 
         <label className="mb-3 form-control w-full">
           <div className="label">

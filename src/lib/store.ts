@@ -11,6 +11,7 @@ const userDefault: IUser = {
 
 // Initialize with default to avoid hydration mismatch
 export const userAtom = atom<IUser>(userDefault);
+export const onlineCountAtom = atom<number>(0);
 
 export const storeUser = (user: IUser) => {
   localStorage.setItem("user", JSON.stringify(user));

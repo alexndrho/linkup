@@ -20,8 +20,15 @@ app.prepare().then(() => {
   const waitingUserVideoChat: string[] = [];
   const pairedUser: { [key: string]: string } = {};
 
+  // Helper to emit online user count
+  const emitOnlineCount = () => {
+    io.emit("online-count", io.sockets.sockets.size);
+  };
+
   // Random chat
   io.on("connection", (socket) => {
+    emitOnlineCount();
+
     socket.on("find-pair", () => {
       if (waitingUserChat.includes(socket.id) || pairedUser[socket.id]) {
         return;
@@ -134,10 +141,10 @@ app.prepare().then(() => {
 
       if (pairedSocketId) {
         io.to(pairedSocketId).emit("pair-disconnected");
-
         delete pairedUser[socket.id];
         delete pairedUser[pairedSocketId];
       }
+      emitOnlineCount();
     });
   });
 

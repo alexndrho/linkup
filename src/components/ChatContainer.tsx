@@ -13,6 +13,7 @@ export interface ChatContainerProps {
   children?: React.ReactNode;
   chatStatus: ChatStatus;
   members?: { [key: string]: IUser };
+  onlineCount?: number;
   sendMessage: (msg: string) => void;
   newChat?: () => void;
   onTyping?: () => void;
@@ -21,6 +22,7 @@ export interface ChatContainerProps {
 
 export default function ChatContainer({
   children,
+  onlineCount,
   chatStatus,
   members,
   sendMessage,
@@ -101,7 +103,7 @@ export default function ChatContainer({
             className="btn btn-square"
             aria-label="Back"
             onClick={() => {
-              socket.disconnect();
+              socket.emit("disconnect-pair");
             }}
           >
             <FaArrowLeft />
@@ -116,6 +118,16 @@ export default function ChatContainer({
         </h1>
 
         <div className="flex-1 flex justify-end">
+          {onlineCount !== undefined && (
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
+              <p className="text-base font-normal ">
+                {onlineCount.toLocaleString()}{" "}
+                {onlineCount <= 1 ? "user" : "users"} online
+              </p>
+            </div>
+          )}
+
           {members && (
             <>
               {Object.keys(members).length > 0 && (

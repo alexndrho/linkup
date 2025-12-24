@@ -7,7 +7,7 @@ import Peer from "peerjs";
 import { useDebouncedCallback } from "@mantine/hooks";
 
 import { socket } from "@/config/socket";
-import { userAtom } from "@/lib/store";
+import { onlineCountAtom, userAtom } from "@/lib/store";
 import ChatBubbleInfo from "../components/ChatBubbleInfo";
 import ChatBubble from "../components/ChatBubble";
 import ChatContainer from "../components/ChatContainer";
@@ -23,6 +23,7 @@ interface RandomChatProps {
 
 const RandomChat = ({ withVideo }: RandomChatProps) => {
   const router = useRouter();
+  const [onlineCount] = useAtom(onlineCountAtom);
 
   const userVideoRef = useRef<HTMLVideoElement>(null);
   const strangerVideoRef = useRef<HTMLVideoElement>(null);
@@ -52,8 +53,6 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
       router.push("/");
       return;
     }
-
-    socket.connect();
 
     if (withVideo) {
       socket.emit("find-video-pair");
@@ -99,7 +98,6 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
     });
 
     return () => {
-      socket.disconnect();
       socket.off("connect");
       socket.off("pair-found");
       socket.off("receive-peer-id");
@@ -244,6 +242,7 @@ const RandomChat = ({ withVideo }: RandomChatProps) => {
 
   return (
     <ChatContainer
+      onlineCount={onlineCount}
       chatStatus={chatStatus}
       newChat={newChat}
       sendMessage={sendMessage}
